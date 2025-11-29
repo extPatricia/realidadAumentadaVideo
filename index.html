@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+  </head>
+	<script>
+       AFRAME.registerComponent('video-handler', {
+		init: function () {
+			this.video = document.querySelector("#videoAmigos");
+			this.video.pause();
+			this.isPlaying = false;
+
+			this.el.sceneEl.addEventListener("targetFound", () => {
+		      console.log("Target detectado: reproduciendo video");
+		      this.video.play();
+		      this.isPlaying = true;
+		    });
+
+			// Listener para perder el target
+			 this.el.sceneEl.addEventListener('targetLost', () => {
+			   if (this.isPlaying) {
+			     this.video.pause();
+			     this.isPlaying = false;
+			     console.log("Target perdido: Video pausado automáticamente");
+			   }
+			 });
+			
+			this.el.addEventListener('click', () => {
+				if (this.isPlaying) {
+					this.video.pause();
+					console.log("Video Pausado");
+				} else {
+					this.video.play();
+					console.log("Video Reproduciendo");
+				}
+				this.isPlaying = !this.isPlaying;
+			});
+		  }
+	   });
+    </script>
+  <body>
+    <a-scene mindar-image="imageTargetSrc: ./targets.mind;" color-space="sRGB" renderer="colorManagement: true, physicallyCorrectLights" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
+      <a-assets>
+		  <video id="videoAmigos" preload="auto" loop playsinline autoplay webkit-playsinline crossOrigin="anonymous" src="./videoAmigos.mp4"></video>
+	  </a-assets>
+
+      <a-camera position="0 0 0" look-controls="enabled: false" cursor="fuse: false; rayOrigin: mouse;" raycaster="near: 10; far: 10000; objects: .clickable"></a-camera>
+
+      <a-entity mindar-image-target="targetIndex: 0">
+		<a-video class="clickable" video-handler src="#videoAmigos" width="2" height="2" position="0 0 0" rotation="0 0 0"></a-video>
+	  </a-entity>
+	   </a-entity>
+    </a-scene> 
+  </body>
+</html>
